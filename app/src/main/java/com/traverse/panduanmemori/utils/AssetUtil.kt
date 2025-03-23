@@ -1,4 +1,4 @@
-package com.traverse.panduanmemori.util
+package com.traverse.panduanmemori.utils
 
 import com.traverse.panduanmemori.BuildConfig
 

@@ -1,15 +1,15 @@
 package com.traverse.panduanmemori.ui.components.elements
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -30,7 +30,7 @@ enum class ButtonSize(val horizontalPadding: Int, val verticalPadding: Int, val 
     LARGE(horizontalPadding = 24, verticalPadding = 14, gap = 8)
 }
 
-enum class IconPosition {
+enum class ButtonIconPosition {
     LEFT, RIGHT, ONLY
 }
 
@@ -38,14 +38,17 @@ enum class IconPosition {
 // COMPONENTS
 @Composable
 fun AppButton(
-    text: String? = "",
+    text: String = "",
     onClick: () -> Unit,
     disabled: Boolean = false,
     size: ButtonSize = ButtonSize.MEDIUM,
     variant: ButtonVariant = ButtonVariant.PRIMARY,
     type: ButtonType = ButtonType.PRIMARY,
     icon: ImageVector? = null,
-    iconPosition: IconPosition = IconPosition.LEFT
+    iconPosition: ButtonIconPosition  = ButtonIconPosition.LEFT,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
+    textDecoration: TextDecoration = TextDecoration.None
 ) {
     val buttonColors = buttonColors(disabled, variant, type)
     val buttonSize = when (size) {
@@ -53,24 +56,37 @@ fun AppButton(
         ButtonSize.MEDIUM -> 56.dp
         else -> 48.dp
     }
-    val iconSize = if (iconPosition == IconPosition.ONLY) buttonSize * 0.5f else 24.dp
+    val iconSize = if (iconPosition == ButtonIconPosition.ONLY) buttonSize * 0.5f else 24.dp
+
+    if (variant == ButtonVariant.TEXT_ONLY) {
+        Text(
+            text = text ?: "",
+            modifier = Modifier.clickable(
+                onClick = onClick,
+                enabled = !disabled
+            ),
+            style = MaterialTheme.typography.button.copy(textDecoration = textDecoration),
+            color = buttonColors.contentColor(enabled = !disabled).value
+        )
+        return
+    }
 
     androidx.compose.material.Button(
         onClick = onClick,
         shape = RoundedCornerShape(200.dp),
-        modifier = if (iconPosition == IconPosition.ONLY) {
-            Modifier.size(buttonSize)
+        modifier = if (iconPosition == ButtonIconPosition.ONLY) {
+            modifier.size(buttonSize)
         } else {
-            Modifier
+            modifier
         },
         colors = buttonColors,
-        enabled = !disabled,
+        enabled = !(disabled || isLoading),
         border = if (variant == ButtonVariant.SECONDARY && !disabled) {
             BorderStroke(2.dp, buttonColors.contentColor(enabled = true).value)
         } else {
             null
         },
-        contentPadding = if (iconPosition != IconPosition.ONLY) {
+        contentPadding = if (iconPosition != ButtonIconPosition.ONLY) {
             PaddingValues(
                 vertical = size.verticalPadding.dp,
                 horizontal = size.horizontalPadding.dp
@@ -81,36 +97,45 @@ fun AppButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (icon != null && iconPosition == IconPosition.LEFT) {
-                IconWrapper(icon, iconSize)
-                if (!text.isNullOrEmpty()) Spacer(modifier = Modifier.width(8.dp))
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(iconSize),
+                    strokeWidth = 2.dp
+                )
+                if (text.isNotEmpty()) Spacer(modifier = Modifier.width(8.dp))
+            } else if (icon != null && iconPosition == ButtonIconPosition.LEFT) {
+                IconWrapper(icon, iconSize, text)
+                if (text.isNotEmpty()) Spacer(modifier = Modifier.width(8.dp))
             }
 
-            if (!text.isNullOrEmpty() && iconPosition != IconPosition.ONLY) {
-                Text(text = text)
+            if (text.isNotEmpty() && iconPosition != ButtonIconPosition.ONLY) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.button.copy(textDecoration = textDecoration)
+                )
             }
 
-            if (icon != null && iconPosition == IconPosition.ONLY) {
-                IconWrapper(icon, iconSize)
+            if (icon != null && iconPosition == ButtonIconPosition.ONLY) {
+                IconWrapper(icon, iconSize, text)
             }
 
-            if (icon != null && iconPosition == IconPosition.RIGHT) {
-                if (!text.isNullOrEmpty()) Spacer(modifier = Modifier.width(8.dp))
-                IconWrapper(icon, iconSize)
+            if (icon != null && iconPosition == ButtonIconPosition.RIGHT) {
+                if (text.isNotEmpty()) Spacer(modifier = Modifier.width(8.dp))
+                IconWrapper(icon, iconSize, text)
             }
         }
     }
 }
 
 @Composable
-private fun IconWrapper(icon: ImageVector, size: Dp) {
+private fun IconWrapper(icon: ImageVector, size: Dp, text: String) {
     Box(
         modifier = Modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = "$text icon",
             modifier = Modifier.size(size)
         )
     }
