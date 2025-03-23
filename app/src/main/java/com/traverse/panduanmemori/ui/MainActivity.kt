@@ -33,6 +33,7 @@ import com.traverse.panduanmemori.ui.auth.AuthenticatedState
 import com.traverse.panduanmemori.ui.components.themes.AppColors
 import com.traverse.panduanmemori.ui.components.themes.PanduanMemoriTheme
 import com.traverse.panduanmemori.ui.home.HomeActivity
+import com.traverse.panduanmemori.ui.activities.ActivitiesViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -42,6 +43,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private val authViewModel by viewModels<AuthViewModel>() {
+        ViewModelFactory.getInstance(this)
+    }
+
+    private val activitiesViewModel by viewModels<ActivitiesViewModel>() {
         ViewModelFactory.getInstance(this)
     }
 

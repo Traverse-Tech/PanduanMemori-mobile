@@ -55,4 +55,5 @@ class ApiConfig(context: Context) {
 
     fun getAuthApiService(): AuthApiService = retrofit.create(AuthApiService::class.java)
     fun getCaregiverApiService(): CaregiverApiService = retrofit.create(CaregiverApiService::class.java)
+    fun getActivityApiService(): ActivityApiService = retrofit.create(ActivityApiService::class.java)
 }
