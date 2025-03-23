@@ -22,7 +22,9 @@ import com.traverse.panduanmemori.data.repositories.ApiState
 import com.traverse.panduanmemori.data.repositories.DEFAULT_ERROR_MESSAGE
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -151,6 +153,12 @@ class AuthViewModel(context: Context): ViewModel() {
 
     suspend fun logout() {
         userContext.logout()
+    }
+
+    fun getUser(): User {
+        return runBlocking {
+            userContext.getSession().first()
+        }
     }
 
 

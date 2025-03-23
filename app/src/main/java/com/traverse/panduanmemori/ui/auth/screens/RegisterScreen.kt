@@ -260,7 +260,7 @@ fun RegisterScreen(
                                             )
                                         )
                                         .background(
-                                            if (gender == Gender.MAN) AppColors.Neutral.`10` else AppColors.Primary.Main,
+                                            if (gender == Gender.MAN) AppColors.Primary.Main else AppColors.Neutral.`10`,
                                             RoundedCornerShape(
                                                 topStart = 16.dp,
                                                 bottomStart = 16.dp
@@ -275,7 +275,7 @@ fun RegisterScreen(
                                     Text(
                                         text = "Laki-laki",
                                         style = MaterialTheme.typography.body1,
-                                        color = if (gender == Gender.MAN) Color.Black else AppColors.Neutral.`10`
+                                        color = if (gender == Gender.MAN) AppColors.Neutral.`10` else Color.Black
                                     )
                                 }
 
@@ -288,7 +288,7 @@ fun RegisterScreen(
                                             RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
                                         )
                                         .background(
-                                            if (gender == Gender.WOMAN) AppColors.Neutral.`10` else AppColors.Primary.Main,
+                                            if (gender == Gender.WOMAN) AppColors.Primary.Main else AppColors.Neutral.`10`,
                                             RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
                                         )
                                         .padding(8.dp)
@@ -300,7 +300,7 @@ fun RegisterScreen(
                                     Text(
                                         text = "Perempuan",
                                         style = MaterialTheme.typography.body1,
-                                        color = if (gender == Gender.WOMAN) Color.Black else AppColors.Neutral.`10`
+                                        color = if (gender == Gender.WOMAN) AppColors.Neutral.`10` else Color.Black
                                     )
                                 }
                             }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,18 +31,19 @@ class HomeActivity : ComponentActivity() {
 
         setContent {
             PanduanMemoriTheme {
+                val context = LocalContext.current
                 val navController = rememberNavController()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.background,
                 ) {
                     NavHost(
                         navController = navController,
                         startDestination = HOME_SCREEN
                     ) {
                         composable(HOME_SCREEN) {
-                            HomeScreen(homeViewModel, authViewModel)
+                            HomeScreen(context, homeViewModel, authViewModel)
                         }
                     }
                 }
