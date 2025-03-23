@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.traverse.panduanmemori.ui.components.elements.*
 import com.traverse.panduanmemori.R
 import com.traverse.panduanmemori.data.models.UserRole
+import com.traverse.panduanmemori.data.repositories.ApiState
 import com.traverse.panduanmemori.ui.auth.*
 import com.traverse.panduanmemori.ui.components.themes.AppColors
 
@@ -35,6 +36,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     val loginState by viewModel.loginState.collectAsState()
+    val authenticatedState by viewModel.authenticatedState.collectAsState()
 
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var toastDescription by remember { mutableStateOf<String?>(null) }
@@ -42,14 +44,18 @@ fun LoginScreen(
 
     LaunchedEffect(loginState) {
         when (loginState) {
-            is LoginState.Success -> {
-                onLoginSuccess()
+            is ApiState.Success -> {
+                if (authenticatedState == AuthenticatedState.Unassigned)
+                    navController.navigate(PATIENT_PROFILE_SCREEN)
+                else
+                    onLoginSuccess()
             }
-            is LoginState.Error -> {
-                val errorState = loginState as LoginState.Error
+            is ApiState.Error -> {
+                val errorState = loginState as ApiState.Error
                 toastMessage = errorState.message
                 toastDescription = errorState.description
                 toastVisible = true
+                viewModel.setLoginState(ApiState.Idle)
             }
             else -> {}
         }
@@ -58,7 +64,7 @@ fun LoginScreen(
     AppToast(
         message = toastMessage ?: "",
         description = toastDescription,
-        variant = if (loginState == LoginState.Success) ToastVariant.SUCCESS else ToastVariant.DANGER,
+        variant = ToastVariant.DANGER,
         isVisible = toastVisible,
         onDismiss = { toastVisible = false }
     )
@@ -140,7 +146,7 @@ fun LoginScreen(
                 type = if (userRole == UserRole.PATIENT) ButtonType.CYAN else ButtonType.PRIMARY,
                 modifier = Modifier.fillMaxWidth(),
                 disabled = identifier.isEmpty() || password.isEmpty(),
-                isLoading = loginState == LoginState.Loading
+                isLoading = loginState == ApiState.Loading
             )
 
             Spacer(modifier = Modifier.height(20.dp))

@@ -20,7 +20,10 @@ data class LoginResponse(
 	val responseCode: Int? = null,
 
 	@field:SerializedName("token")
-	val token: String? = null
+	val token: String? = null,
+
+	@field:SerializedName("isAssignedToPatient")
+	val isAssignedToPatient: Boolean? = null
 ) : Parcelable
 
 @Parcelize
@@ -51,5 +54,8 @@ data class User(
 	val dementiaStage: String? = null,
 
 	@field:SerializedName("email")
-	val email: String? = null
+	val email: String? = null,
+
+	@field:SerializedName("patientId")
+	val patientId: String? = null
 ) : Parcelable

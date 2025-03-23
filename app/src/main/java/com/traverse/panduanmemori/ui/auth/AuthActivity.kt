@@ -1,5 +1,7 @@
 package com.traverse.panduanmemori.ui.auth
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,10 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.traverse.panduanmemori.ui.ViewModelFactory
-import com.traverse.panduanmemori.ui.auth.screens.LoginScreen
-import com.traverse.panduanmemori.ui.auth.screens.OnboardingScreen
-import com.traverse.panduanmemori.ui.auth.screens.RegisterScreen
-import com.traverse.panduanmemori.ui.auth.screens.RoleSelectionScreen
+import com.traverse.panduanmemori.ui.auth.screens.*
 import com.traverse.panduanmemori.ui.components.themes.PanduanMemoriTheme
 import com.traverse.panduanmemori.ui.home.HomeActivity
 
@@ -51,10 +50,13 @@ class AuthActivity : ComponentActivity() {
 
                         composable(LOGIN_SCREEN) {
                             LoginScreen(navController, authViewModel, onLoginSuccess = {
-                                val intent = Intent(context, HomeActivity::class.java)
-                                startActivity(intent)
-                                overridePendingTransition(0, 0)
-                                finish()
+                                navigateToHomePage(context)
+                            })
+                        }
+
+                        composable(PATIENT_PROFILE_SCREEN) {
+                            PatientProfileScreen(authViewModel, onAssignPatientSuccess = {
+                                navigateToHomePage(context)
                             })
                         }
 
@@ -75,5 +77,12 @@ class AuthActivity : ComponentActivity() {
     private fun customOnboardingBackButtonAction() {
         if (authViewModel.onboardingCurrentIndex.value != 0)
             authViewModel.resetItem()
+    }
+
+    fun navigateToHomePage(context: Context) {
+        val intent = Intent(context, HomeActivity::class.java)
+        context.startActivity(intent)
+        (context as? Activity)?.overridePendingTransition(0, 0)
+        (context as? Activity)?.finish()
     }
 }

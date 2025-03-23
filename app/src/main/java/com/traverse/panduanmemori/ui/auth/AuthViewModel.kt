@@ -13,13 +13,13 @@ import com.traverse.panduanmemori.data.contexts.IsLoginContext
 import com.traverse.panduanmemori.data.contexts.UserContext
 import com.traverse.panduanmemori.data.contexts.isLoginDataStore
 import com.traverse.panduanmemori.data.contexts.sessionDataStore
-import com.traverse.panduanmemori.data.dataclasses.ErrorResponse
-import com.traverse.panduanmemori.data.dataclasses.LoginRequest
-import com.traverse.panduanmemori.data.dataclasses.OnboardingItem
+import com.traverse.panduanmemori.data.dataclasses.*
 import com.traverse.panduanmemori.data.models.Gender
 import com.traverse.panduanmemori.data.models.User
 import com.traverse.panduanmemori.data.models.UserRole
 import com.traverse.panduanmemori.data.repositories.ApiConfig
+import com.traverse.panduanmemori.data.repositories.ApiState
+import com.traverse.panduanmemori.data.repositories.DEFAULT_ERROR_MESSAGE
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -41,15 +41,19 @@ class AuthViewModel(context: Context): ViewModel() {
         return _userRole.value
     }
 
-    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState
+    private val _loginState = MutableStateFlow<ApiState>(ApiState.Idle)
+    val loginState: StateFlow<ApiState> = _loginState
+
+    fun setLoginState(loginState: ApiState) {
+        _loginState.value = loginState
+    }
 
     fun login(identifier: String, password: String) {
         viewModelScope.launch {
-            _loginState.value = LoginState.Loading
+            _loginState.value = ApiState.Loading
 
             try {
-                val response = apiConfig.getAuthApiService().login(LoginRequest(identifier, password))
+                val response = apiConfig.getAuthApiService().login(LoginRequest(identifier, password, _userRole.value.toString()))
                 val user = User(
                     token = response.token ?: "",
                     name = response.user?.name ?: "",
@@ -60,20 +64,22 @@ class AuthViewModel(context: Context): ViewModel() {
                     address = response.user?.address ?: "",
                     birthdate = response.user?.birthdate ?: "",
                     gender = response.user?.gender?.let { Gender.valueOf(it) } ?: Gender.MAN,
-                    dementiaStage = response.user?.dementiaStage
+                    dementiaStage = response.user?.dementiaStage,
+                    patientId = response.user?.patientId ?: ""
                 )
                 userContext.saveSession(user)
+                checkAuthentication()
                 isLoginContext.setLoginState(true)
-                _loginState.value = LoginState.Success
+                _loginState.value = ApiState.Success
             } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string()
                 val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
-                _loginState.value = LoginState.Error(
-                    message = errorResponse.responseMessage ?: "Terjadi kesalahan",
+                _loginState.value = ApiState.Error(
+                    message = errorResponse.responseMessage ?: DEFAULT_ERROR_MESSAGE,
                     description = errorResponse.errorDescription
                 )
             } catch (e: Exception) {
-                _loginState.value = LoginState.Error("Terjadi kesalahan", e.message)
+                _loginState.value = ApiState.Error(DEFAULT_ERROR_MESSAGE, e.message)
             }
         }
     }
@@ -82,15 +88,92 @@ class AuthViewModel(context: Context): ViewModel() {
         userContext.logout()
     }
 
+
+    // Assign Patient
+    private val _searchPatientState = MutableStateFlow<ApiState>(ApiState.Idle)
+    val searchPatientState: StateFlow<ApiState> = _searchPatientState
+
+    fun setSearchPatientState(searchPatientState: ApiState) {
+        _searchPatientState.value = searchPatientState
+    }
+
+    private val _selectedPatient = MutableLiveData<SelectedPatient>()
+    val selectedPatient: LiveData<SelectedPatient> = _selectedPatient
+
+    fun searchPatientByCredential(identifier: String, password: String) {
+        viewModelScope.launch {
+            _searchPatientState.value = ApiState.Loading
+
+            try {
+                val response = apiConfig.getCaregiverApiService().searchPatientByCredential(
+                    SearchPatientByCredentialRequest(identifier, password)
+                )
+                _searchPatientState.value = ApiState.Success
+                _selectedPatient.value = SelectedPatient(
+                    id = response.patientId ?: "",
+                    name = response.name ?: "",
+                    age = response.age ?: 0
+                )
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
+                _searchPatientState.value = ApiState.Error(
+                    message = errorResponse.responseMessage ?: DEFAULT_ERROR_MESSAGE,
+                    description = errorResponse.errorDescription
+                )
+                _selectedPatient.value = null
+            } catch (e: Exception) {
+                _searchPatientState.value = ApiState.Error(DEFAULT_ERROR_MESSAGE, e.message)
+                _selectedPatient.value = null
+            }
+        }
+    }
+
+    private val _assignPatientState = MutableStateFlow<ApiState>(ApiState.Idle)
+    val assignPatientState: StateFlow<ApiState> = _assignPatientState
+
+    fun setAssignPatientState(assignPatientState: ApiState) {
+        _assignPatientState.value = assignPatientState
+    }
+
+    fun updateAssignedPatient(patientId: String) {
+        viewModelScope.launch {
+            _assignPatientState.value = ApiState.Loading
+
+            try {
+                apiConfig.getCaregiverApiService().updateAssignedPatient(
+                    UpdateAssignedPatientRequest(patientId)
+                )
+                _assignPatientState.value = ApiState.Success
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
+                _assignPatientState.value = ApiState.Error(
+                    message = errorResponse.responseMessage ?: DEFAULT_ERROR_MESSAGE,
+                    description = errorResponse.errorDescription
+                )
+            } catch (e: Exception) {
+                _assignPatientState.value = ApiState.Error(DEFAULT_ERROR_MESSAGE, e.message)
+            }
+        }
+    }
+
+
     // SPLASH SCREEN
-    private val _isAuthenticated = MutableLiveData(false)
-    val isAuthenticated: LiveData<Boolean> get() = _isAuthenticated
+    private val _authenticatedState = MutableStateFlow<AuthenticatedState>(AuthenticatedState.Unassigned)
+    val authenticatedState: StateFlow<AuthenticatedState> get() = _authenticatedState
 
     fun checkAuthentication() {
         viewModelScope.launch {
             userContext.getSession()
                 .collect { user ->
-                    _isAuthenticated.value = user.token.isNotEmpty()
+                    if (user.token.isEmpty()) {
+                        _authenticatedState.value = AuthenticatedState.Unauthenticated
+                    } else if (user.role == UserRole.CAREGIVER && user.patientId.isNullOrEmpty()) {
+                        _authenticatedState.value = AuthenticatedState.Unassigned
+                    } else {
+                        _authenticatedState.value = AuthenticatedState.Authenticated
+                    }
                 }
         }
     }

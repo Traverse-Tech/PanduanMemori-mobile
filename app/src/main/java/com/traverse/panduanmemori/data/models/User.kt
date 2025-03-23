@@ -10,7 +10,8 @@ data class User(
     val address: String,
     val birthdate: String,
     val gender: Gender,
-    val dementiaStage: String?
+    val dementiaStage: String?,
+    val patientId: String?
 )
 
 enum class UserRole {

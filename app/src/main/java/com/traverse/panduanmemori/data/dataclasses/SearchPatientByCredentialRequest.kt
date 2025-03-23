@@ -2,13 +2,10 @@ package com.traverse.panduanmemori.data.dataclasses
 
 import com.google.gson.annotations.SerializedName
 
-data class LoginRequest(
+data class SearchPatientByCredentialRequest (
     @field:SerializedName("identifier")
     val identifier: String,
 
     @field:SerializedName("password")
-    val password: String,
-
-    @field:SerializedName("role")
-    val role: String
+    val password: String
 )

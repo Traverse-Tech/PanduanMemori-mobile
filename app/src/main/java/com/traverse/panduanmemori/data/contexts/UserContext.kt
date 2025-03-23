@@ -27,6 +27,7 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
             preferences[BIRTHDATE] = user.birthdate
             preferences[GENDER] = user.gender.toString()
             preferences[DEMENTIA_STAGE] = user.dementiaStage.toString()
+            preferences[PATIENT_ID] = user.patientId ?: ""
         }
     }
 
@@ -50,7 +51,8 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
                 } catch (e: IllegalArgumentException) {
                     Gender.MAN
                 },
-                dementiaStage = preferences[DEMENTIA_STAGE] ?: ""
+                dementiaStage = preferences[DEMENTIA_STAGE] ?: "",
+                patientId = preferences[PATIENT_ID]
             )
         }
     }
@@ -73,8 +75,9 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
         private val ROLE = stringPreferencesKey("role")
         private val ADDRESS = stringPreferencesKey("address")
         private val BIRTHDATE = stringPreferencesKey("birthdate")
-        private val GENDER = stringPreferencesKey("token")
+        private val GENDER = stringPreferencesKey("gender")
         private val DEMENTIA_STAGE = stringPreferencesKey("dementiaStage")
+        private val PATIENT_ID = stringPreferencesKey("patientId")
 
         fun getInstance(dataStore: DataStore<Preferences>): UserContext {
             return INSTANCE ?: synchronized(this) {

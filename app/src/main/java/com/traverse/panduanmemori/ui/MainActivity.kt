@@ -29,6 +29,7 @@ import androidx.lifecycle.*
 import com.traverse.panduanmemori.R
 import com.traverse.panduanmemori.ui.auth.AuthActivity
 import com.traverse.panduanmemori.ui.auth.AuthViewModel
+import com.traverse.panduanmemori.ui.auth.AuthenticatedState
 import com.traverse.panduanmemori.ui.components.themes.AppColors
 import com.traverse.panduanmemori.ui.components.themes.PanduanMemoriTheme
 import com.traverse.panduanmemori.ui.home.HomeActivity
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PanduanMemoriTheme {
                 val context = LocalContext.current
-                val isAuthenticated by authViewModel.isAuthenticated.asFlow().collectAsState(initial = false)
+                val authenticatedState by authViewModel.authenticatedState.collectAsState()
 
                 LaunchedEffect(Unit) {
                     authViewModel.checkAuthentication()
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     SplashScreen(mainViewModel, onFinish = {
-                        val intent = if (isAuthenticated) {
+                        val intent = if (authenticatedState == AuthenticatedState.Authenticated) {
                             Intent(context, HomeActivity::class.java)
                         } else {
                             Intent(context, AuthActivity::class.java)
