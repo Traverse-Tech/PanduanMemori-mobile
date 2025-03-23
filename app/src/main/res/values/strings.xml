@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PanduanMemori</string>
+    <string name="google_maps_api_key">AIzaSyBWtSs-LzmnfMzakiJRKoU-PRXy5i7l_iU</string>
 </resources>

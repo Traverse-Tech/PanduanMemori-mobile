@@ -61,7 +61,9 @@ class AuthActivity : ComponentActivity() {
                         }
 
                         composable(REGISTER_SCREEN) {
-                            RegisterScreen(navController, authViewModel)
+                            RegisterScreen(navController, authViewModel, onRegisterSuccess = {
+                                navigateToHomePage(context)
+                            })
                         }
                     }
                 }

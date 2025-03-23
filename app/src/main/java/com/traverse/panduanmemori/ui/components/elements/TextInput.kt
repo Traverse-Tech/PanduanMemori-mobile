@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -27,7 +28,7 @@ fun AppTextInput(
     onValueChange: (String) -> Unit,
     title: String = "",
     placeholder: String = "",
-    type: KeyboardType? = KeyboardType.Text,
+    type: KeyboardType = KeyboardType.Text,
     leftIcon: ImageVector? = null,
     leftIconColor: Color = AppColors.Primary.Main,
     rightIcon: ImageVector? = null,
@@ -56,6 +57,9 @@ fun AppTextInput(
             textStyle = MaterialTheme.typography.body1.copy(color = AppColors.Neutral.`110`),
             singleLine = true,
             maxLines = 1,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = type
+            ),
             visualTransformation = if (type == KeyboardType.Password && !passwordVisible) {
                 PasswordVisualTransformation()
             } else {
@@ -83,6 +87,14 @@ fun AppTextInput(
                                     tint = leftIconColor
                                 )
                             }
+                        }
+
+                        if (type == KeyboardType.Phone) {
+                            Text(
+                                text = "+62",
+                                style = MaterialTheme.typography.body1,
+                                color = leftIconColor
+                            )
                         }
 
                         Box(modifier = Modifier.weight(1f)) {
