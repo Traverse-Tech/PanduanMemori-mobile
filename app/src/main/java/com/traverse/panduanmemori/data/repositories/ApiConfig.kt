@@ -12,8 +12,9 @@ import com.traverse.panduanmemori.data.contexts.UserContext
 import com.traverse.panduanmemori.data.contexts.sessionDataStore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 
-class ApiConfig(context: Context) {
+class ApiConfig(context: Context, isAi: Boolean? = false) {
     private val BASE_URL = BuildConfig.BASE_URL
     private val userContext = UserContext.getInstance(context.sessionDataStore)
 
@@ -45,14 +46,20 @@ class ApiConfig(context: Context) {
     private val client = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(1, TimeUnit.MINUTES)
+        .writeTimeout(1, TimeUnit.MINUTES)
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(if (isAi == true) "http://34.133.9.99:8000/" else BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
 
     fun getAuthApiService(): AuthApiService = retrofit.create(AuthApiService::class.java)
     fun getCaregiverApiService(): CaregiverApiService = retrofit.create(CaregiverApiService::class.java)
+    fun getPatientApiService(): PatientApiService = retrofit.create(PatientApiService::class.java)
+    fun getActivityApiService(): ActivityApiService = retrofit.create(ActivityApiService::class.java)
+    fun getDashboardApiService(): DashboardApiService = retrofit.create(DashboardApiService::class.java)
 }

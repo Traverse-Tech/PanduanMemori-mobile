@@ -68,7 +68,7 @@ fun OnboardingScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.984f)
+                    .aspectRatio(0.742f)
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(model = AssetUtil.getAssetUrl(onboardingCurrentItem.imageUrl)),

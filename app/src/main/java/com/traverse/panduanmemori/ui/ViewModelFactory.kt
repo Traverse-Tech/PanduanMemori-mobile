@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.traverse.panduanmemori.ui.auth.AuthViewModel
 import com.traverse.panduanmemori.ui.home.HomeViewModel
+import com.traverse.panduanmemori.ui.task.TaskViewModel
 
 class ViewModelFactory private constructor(private val context: Context) : ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
@@ -21,6 +22,10 @@ class ViewModelFactory private constructor(private val context: Context) : ViewM
 
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> {
                 AuthViewModel(context) as T
+            }
+
+            modelClass.isAssignableFrom(TaskViewModel::class.java) -> {
+                TaskViewModel(context) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

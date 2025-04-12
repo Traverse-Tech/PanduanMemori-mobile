@@ -11,7 +11,7 @@ data class User(
     val birthdate: String,
     val gender: Gender,
     val dementiaStage: String?,
-    val patientId: String?
+    val isAssignedToPatient: Boolean?
 )
 
 enum class UserRole {

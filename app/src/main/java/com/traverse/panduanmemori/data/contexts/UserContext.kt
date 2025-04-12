@@ -3,6 +3,7 @@ package com.traverse.panduanmemori.data.contexts
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -27,7 +28,7 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
             preferences[BIRTHDATE] = user.birthdate
             preferences[GENDER] = user.gender.toString()
             preferences[DEMENTIA_STAGE] = user.dementiaStage.toString()
-            preferences[PATIENT_ID] = user.patientId ?: ""
+            preferences[IS_ASSIGNED_TO_PATIENT] = user.isAssignedToPatient ?: false
         }
     }
 
@@ -52,7 +53,7 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
                     Gender.MAN
                 },
                 dementiaStage = preferences[DEMENTIA_STAGE] ?: "",
-                patientId = preferences[PATIENT_ID]
+                isAssignedToPatient = preferences[IS_ASSIGNED_TO_PATIENT]
             )
         }
     }
@@ -77,7 +78,7 @@ class UserContext private constructor(private val dataStore: DataStore<Preferenc
         private val BIRTHDATE = stringPreferencesKey("birthdate")
         private val GENDER = stringPreferencesKey("gender")
         private val DEMENTIA_STAGE = stringPreferencesKey("dementiaStage")
-        private val PATIENT_ID = stringPreferencesKey("patientId")
+        private val IS_ASSIGNED_TO_PATIENT = booleanPreferencesKey("isAssignedToPatient")
 
         fun getInstance(dataStore: DataStore<Preferences>): UserContext {
             return INSTANCE ?: synchronized(this) {

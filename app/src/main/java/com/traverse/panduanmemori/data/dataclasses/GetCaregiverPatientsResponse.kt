@@ -5,7 +5,10 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
 @Parcelize
-data class LoginResponse(
+data class GetCaregiverPatientsResponse(
+
+	@field:SerializedName("data")
+	val data: List<DataItem?>? = null,
 
 	@field:SerializedName("responseMessage")
 	val responseMessage: String? = null,
@@ -13,33 +16,15 @@ data class LoginResponse(
 	@field:SerializedName("responseStatus")
 	val responseStatus: String? = null,
 
-	@field:SerializedName("user")
-	val user: User? = null,
-
 	@field:SerializedName("responseCode")
-	val responseCode: Int? = null,
-
-	@field:SerializedName("token")
-	val token: String? = null,
-
-	@field:SerializedName("isAssignedToPatient")
-	val isAssignedToPatient: Boolean? = null
+	val responseCode: Int? = null
 ) : Parcelable
 
 @Parcelize
-data class User(
-
-	@field:SerializedName("id")
-	val id: String? = null,
+data class DataItem(
 
 	@field:SerializedName("phoneNumber")
 	val phoneNumber: String? = null,
-
-	@field:SerializedName("role")
-	val role: String? = null,
-
-	@field:SerializedName("address")
-	val address: String? = null,
 
 	@field:SerializedName("birthdate")
 	val birthdate: String? = null,
@@ -53,9 +38,12 @@ data class User(
 	@field:SerializedName("name")
 	val name: String? = null,
 
+	@field:SerializedName("id")
+	val id: String? = null,
+
 	@field:SerializedName("dementiaStage")
 	val dementiaStage: String? = null,
 
-	@field:SerializedName("email")
-	val email: String? = null
+	@field:SerializedName("age")
+	val age: Int? = null
 ) : Parcelable

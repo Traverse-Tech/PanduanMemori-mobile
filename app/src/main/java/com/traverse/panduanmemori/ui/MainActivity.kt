@@ -2,6 +2,7 @@ package com.traverse.panduanmemori.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     SplashScreen(mainViewModel, onFinish = {
+                        Log.d("AUTHENTICATION STATE", authenticatedState.toString())
                         val intent = if (authenticatedState == AuthenticatedState.Authenticated) {
                             Intent(context, HomeActivity::class.java)
                         } else {

@@ -22,7 +22,9 @@ import com.traverse.panduanmemori.data.repositories.ApiState
 import com.traverse.panduanmemori.data.repositories.DEFAULT_ERROR_MESSAGE
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,7 +58,7 @@ class AuthViewModel(context: Context): ViewModel() {
 
             try {
                 val response = apiConfig.getAuthApiService().login(LoginRequest(identifier, password, _userRole.value.toString()))
-                val user = User(
+                val user = com.traverse.panduanmemori.data.models.User(
                     token = response.token ?: "",
                     name = response.user?.name ?: "",
                     phoneNumber = response.user?.phoneNumber ?: "",
@@ -67,7 +69,7 @@ class AuthViewModel(context: Context): ViewModel() {
                     birthdate = response.user?.birthdate ?: "",
                     gender = response.user?.gender?.let { Gender.valueOf(it) } ?: Gender.MAN,
                     dementiaStage = response.user?.dementiaStage,
-                    patientId = response.user?.patientId ?: ""
+                    isAssignedToPatient = response.isAssignedToPatient
                 )
                 userContext.saveSession(user)
                 checkAuthentication()
@@ -119,7 +121,7 @@ class AuthViewModel(context: Context): ViewModel() {
                         longitude = 93.12312F
                     )
                 )
-                val user = User(
+                val user = com.traverse.panduanmemori.data.models.User(
                     token = response.token ?: "",
                     name = response.user?.name ?: "",
                     phoneNumber = response.user?.phoneNumber ?: "",
@@ -130,7 +132,7 @@ class AuthViewModel(context: Context): ViewModel() {
                     birthdate = response.user?.birthdate ?: "",
                     gender = response.user?.gender?.let { Gender.valueOf(it) } ?: Gender.MAN,
                     dementiaStage = response.user?.dementiaStage,
-                    patientId = response.user?.patientId ?: ""
+                    isAssignedToPatient = false
                 )
                 userContext.saveSession(user)
                 checkAuthentication()
@@ -151,6 +153,12 @@ class AuthViewModel(context: Context): ViewModel() {
 
     suspend fun logout() {
         userContext.logout()
+    }
+
+    fun getUser(): User {
+        return runBlocking {
+            userContext.getSession().first()
+        }
     }
 
 
@@ -232,9 +240,10 @@ class AuthViewModel(context: Context): ViewModel() {
         viewModelScope.launch {
             userContext.getSession()
                 .collect { user ->
+                    val isAssigned = user.isAssignedToPatient ?: false
                     if (user.token.isEmpty()) {
                         _authenticatedState.value = AuthenticatedState.Unauthenticated
-                    } else if (user.role == UserRole.CAREGIVER && user.patientId.isNullOrEmpty()) {
+                    } else if (user.role == UserRole.CAREGIVER && !isAssigned) {
                         _authenticatedState.value = AuthenticatedState.Unassigned
                     } else {
                         _authenticatedState.value = AuthenticatedState.Authenticated

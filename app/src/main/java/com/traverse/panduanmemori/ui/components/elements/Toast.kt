@@ -66,7 +66,8 @@ fun AppToast(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.Start) // <-- ini dia biar secukupnya
+                    .fillMaxWidth() // supaya tetap nempel kiri kanan kalau butuh
                     .border(1.dp, AppColors.Neutral.`30`, RoundedCornerShape(8.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
