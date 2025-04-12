@@ -1,6 +1,10 @@
 # PanduanMemori by Traverse
 ![PanduanMemori](https://storage.googleapis.com/panduanmemori-cdn/assets/logo_panduanmemori.png)
 
+# Link ke Repositories Lain
+1. API Backend: [https://github.com/Traverse-Tech/PanduanMemori-api](https://github.com/Traverse-Tech/PanduanMemori-api)
+2. AI Service: [https://github.com/Traverse-Tech/ai-service](https://github.com/Traverse-Tech/ai-service)
+
 ## Table of Contents 📔
 - [Team Members](#Team-)
 - [Background](#Background-)
