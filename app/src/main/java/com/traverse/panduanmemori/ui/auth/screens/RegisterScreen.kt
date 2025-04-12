@@ -68,7 +68,6 @@ fun RegisterScreen(
 
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-//    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var toastDescription by remember { mutableStateOf<String?>(null) }

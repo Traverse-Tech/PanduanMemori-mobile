@@ -33,11 +33,12 @@ fun AppTextInput(
     leftIconColor: Color = AppColors.Primary.Main,
     rightIcon: ImageVector? = null,
     rightIconColor: Color = AppColors.Primary.Main,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    columnModifier: Modifier = Modifier.fillMaxWidth()
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = columnModifier) {
         Text(
             text = title,
             style = MaterialTheme.typography.caption,

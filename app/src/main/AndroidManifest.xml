@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -41,10 +42,16 @@
         <activity
             android:name=".ui.auth.AuthActivity"
             android:theme="@style/Theme.PanduanMemori" />
+        <activity
+            android:name=".ui.location.LocationActivity"
+            android:theme="@style/Theme.PanduanMemori" />
+        <activity
+            android:name=".ui.task.TaskActivity"
+            android:theme="@style/Theme.PanduanMemori" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_api_key" />
+            android:value="AIzaSyCv6F5Xm2fNrbEKyi8e_gQexw8Wfg_rot4" />
     </application>
 
 </manifest>

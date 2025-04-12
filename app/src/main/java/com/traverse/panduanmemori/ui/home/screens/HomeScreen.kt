@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Environment
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,11 +37,15 @@ import com.traverse.panduanmemori.ui.components.elements.*
 import com.traverse.panduanmemori.ui.components.themes.AppColors
 import com.traverse.panduanmemori.ui.home.HomeViewModel
 import com.traverse.panduanmemori.utils.AssetUtil
+import com.traverse.panduanmemori.utils.AudioPlayer
 import com.traverse.panduanmemori.utils.AudioRecorder
 import com.traverse.panduanmemori.utils.StringUtil
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
+import java.io.FileOutputStream
 
 @Composable
 fun HomeScreen(context: Context, homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
@@ -77,14 +82,6 @@ fun HomeScreen(context: Context, homeViewModel: HomeViewModel, authViewModel: Au
         }
     }
 
-    AppToast(
-        message = toastMessage ?: "",
-        description = toastDescription,
-        variant = ToastVariant.SUCCESS,
-        isVisible = toastVisible,
-        onDismiss = { toastVisible = false }
-    )
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -110,129 +107,30 @@ fun HomeScreen(context: Context, homeViewModel: HomeViewModel, authViewModel: Au
                 isBuddyLoading = buddyState == ApiState.Loading
             )
         }
-    ) {
-        if (userRole == UserRole.CAREGIVER) {
-            CaregiverHomePage(
-                homeViewModel,
-                authViewModel
-            )
-        } else {
-            PatientHomePage(
-                context,
-                homeViewModel,
-                authViewModel,
-                isRecording
-            )
-        }
-    }
-}
-
-@Composable
-fun PatientHomePage(context: Context, homeViewModel: HomeViewModel, authViewModel: AuthViewModel, isRecording: Boolean) {
-    val coroutineScope = rememberCoroutineScope()
-    val getUser = authViewModel.getUser()
-    val initialName = getUser.name.first().toString().uppercase()
-    val randomColor = StringUtil.getRandomColorFromString(initialName)
-    val textColor = if (randomColor.red + randomColor.green + randomColor.blue > 1.5f) AppColors.Neutral.`110` else AppColors.Neutral.`10`
-
-    val buddyState by homeViewModel.buddyState.collectAsState()
-
-    var buddyDefaultText by remember { mutableStateOf("Halo! Kenalin aku Nana, Aku siap membantu dan selalu menemani Bapak!") }
-
-    LaunchedEffect(Unit) {
-        delay(5000)
-        buddyDefaultText = "Silakan tahan tombol mikrofon pada layar untuk mulai ngobrol sama Nana, ya!"
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "PanduanMemori",
-                style = MaterialTheme.typography.subtitle1,
-                color = AppColors.Primary.Main
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            AppToast(
+                message = toastMessage ?: "",
+                description = toastDescription,
+                variant = ToastVariant.SUCCESS,
+                isVisible = toastVisible,
+                onDismiss = { toastVisible = false }
             )
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(40.dp)
-                    .background(color = randomColor, shape = CircleShape)
-                    .clickable {
-                        coroutineScope.launch {
-                            authViewModel.logout()
-                        }
-                        val intent = Intent(context, AuthActivity::class.java)
-                        context.startActivity(intent)
-                        (context as? Activity)?.overridePendingTransition(0, 0)
-                        (context as? Activity)?.finish()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = initialName,
-                    style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
-                    color = textColor
+            if (userRole == UserRole.CAREGIVER) {
+                CaregiverHomePage(
+                    context,
+                    homeViewModel,
+                    authViewModel
+                )
+            } else {
+                PatientHomePage(
+                    context,
+                    homeViewModel,
+                    authViewModel,
+                    isRecording
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .aspectRatio(1f)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(model = AssetUtil.getAssetUrl("nana.png")),
-                        contentDescription = "Buddy",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(AppColors.Primary.`100`)
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (buddyState == ApiState.Success) homeViewModel.buddyConversationResponse.value ?: "" else if (buddyState == ApiState.Loading) "Memproses..." else if (isRecording) "Mendengarkan" else buddyDefaultText,
-                        style = MaterialTheme.typography.body1.copy(fontStyle = if (buddyState == ApiState.Loading || isRecording) FontStyle.Italic else FontStyle.Normal),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
     }
-}
-
-@Composable
-fun CaregiverHomePage(homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
-    val coroutineScope = rememberCoroutineScope()
-
-    AppButton(text = "Keluar", size = ButtonSize.LARGE, onClick = {
-        coroutineScope.launch {
-            authViewModel.logout()
-        }
-    })
 }

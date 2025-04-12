@@ -11,12 +11,12 @@ class AudioRecorder {
 
     fun startRecording(): String {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        outputFile = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)}/panduanmemory_buddy_$timestamp.wav"
+        outputFile = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)}/panduanmemory_buddy_$timestamp.m4a"
 
         recorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             setOutputFile(outputFile)
             prepare()
             start()

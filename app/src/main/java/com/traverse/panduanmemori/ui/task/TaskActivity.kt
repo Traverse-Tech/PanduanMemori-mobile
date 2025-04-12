@@ -1,4 +1,4 @@
-package com.traverse.panduanmemori.ui.home
+package com.traverse.panduanmemori.ui.task
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,20 +12,19 @@ import androidx.compose.ui.platform.LocalContext
 import com.traverse.panduanmemori.ui.ViewModelFactory
 import com.traverse.panduanmemori.ui.auth.AuthViewModel
 import com.traverse.panduanmemori.ui.components.themes.PanduanMemoriTheme
-import com.traverse.panduanmemori.ui.home.screens.HomeScreen
+import com.traverse.panduanmemori.ui.task.screens.TaskScreen
 
-class HomeActivity : ComponentActivity() {
-    private val homeViewModel by viewModels<HomeViewModel>() {
+class TaskActivity : ComponentActivity() {
+    private val authViewModel by viewModels<AuthViewModel>() {
         ViewModelFactory.getInstance(this)
     }
 
-    private val authViewModel by viewModels<AuthViewModel>() {
+    private val taskViewModel by viewModels<TaskViewModel> {
         ViewModelFactory.getInstance(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             PanduanMemoriTheme {
                 val context = LocalContext.current
@@ -34,7 +33,7 @@ class HomeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
                 ) {
-                    HomeScreen(context, homeViewModel, authViewModel)
+                    TaskScreen(context, taskViewModel, authViewModel)
                 }
             }
         }
